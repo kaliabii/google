@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, send_file, redirect
 
 app = Flask(__name__)
 
@@ -9,7 +9,7 @@ def home():
 
     print(f"[visitor] IP: {user_ip}, Browser: {user_ag}")
 
-    return render_template("logingnew.html")
+    return send_file("logingnew.html")
 
 @app.route('/login', methods=['POST'])
 def login():
